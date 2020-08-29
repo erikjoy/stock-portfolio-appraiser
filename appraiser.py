@@ -12,6 +12,8 @@ class PortfolioAppraiser:
 
     def calculate(self):
         holdings_data = yfinance.download(' '.join(tuple(self.holdings)), group_by='ticker', period='2d')
+        if len(self.holdings) != len(holdings_data.columns) / 6:
+            raise RateLimitError('Requests were rejected due to the rate and volume of recent requests')
         total_holdings_value = 0
         for symbol in self.holdings:
             stock_closing_data = holdings_data[symbol]['Close']
@@ -36,6 +38,13 @@ class FundAppraiser(PortfolioAppraiser):
     def calculate(self):
         percentage_change = super().calculate()
         fund_data = yfinance.Ticker(self.fund_symbol)
-        last_closing_price = fund_data.history(period='2d')['Close'][0]
+        closing_price_data = fund_data.history(period='2d')['Close']
+        if len(closing_price_data) == 0:
+            raise RateLimitError('Requests were rejected due to the rate and volume of recent requests')
+        last_closing_price = closing_price_data[0]
         fund_current_value = last_closing_price * (percentage_change + 100) / 100
         return (fund_current_value, percentage_change)
+
+
+class RateLimitError(Exception):
+    '''Raise when yfinance rejects requests due to the rate and volume of recent requests'''
