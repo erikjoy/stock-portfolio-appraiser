@@ -7,15 +7,15 @@ class ProcessConfig:
     def _get_holdings_data(config):
         holdings = {}
         cash_equivalents_percentage, total_percentage = 0, 0
-        with open(config['holdings_file_path'], 'r') as f:
-            for line in f:
-                (symbol, percentage) = line.split()
-                percentage = float(percentage)
-                total_percentage += percentage
-                if symbol == config['cash_equivalents_name']:
-                    cash_equivalents_percentage += percentage
-                else:
-                    holdings[symbol] = percentage
+        holdings_list = open(config['holdings_file_path'], 'r')
+        for i in holdings_list:
+            (symbol, percentage) = i.split()
+            percentage = float(percentage)
+            total_percentage += percentage
+            if symbol == config['cash_equivalents_name']:
+                cash_equivalents_percentage += percentage
+            else:
+                holdings[symbol] = percentage
         return (holdings, cash_equivalents_percentage)
 
     @staticmethod
