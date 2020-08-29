@@ -3,10 +3,10 @@ from appraiser import FundAppraiser, PortfolioAppraiser
 
 
 class ProcessConfig:
-    def __init__(self, config_file_path):
-        self.config = load(open(config_file_path, 'r'))
+    def __init__(self, config):
+        self.config = config
 
-    def get_holdings_data(self):
+    def _get_holdings_data(self):
         holdings = {}
         cash_equivalents_percentage, total_percentage = 0, 0
         with open(self.config['holdings_file_path'], 'r') as f:
@@ -22,8 +22,8 @@ class ProcessConfig:
             raise HoldingsPercentageError('The percentages of the holdings don\'t sum up to 100')
         return (holdings, cash_equivalents_percentage)
 
-    def select_appraiser(self):
-        (holdings, cash_equivalents_percentage) = self.get_holdings_data()
+    def _select_appraiser(self):
+        (holdings, cash_equivalents_percentage) = self._get_holdings_data()
         if self.config['is_fund']:
             return FundAppraiser(
                 holdings,
@@ -37,9 +37,15 @@ class ProcessConfig:
                 self.config['cash_equivalents_growth'])
 
     @staticmethod
-    def auto_process(config_file_path):
-        settings = ProcessConfig(config_file_path)
-        return settings.select_appraiser()
+    def process(config):
+        settings = ProcessConfig(config)
+        return settings._select_appraiser()
+
+    @staticmethod
+    def process_path(config_file_path):
+        config = load(open(config_file_path, 'r'))
+        settings = ProcessConfig(config)
+        return settings._select_appraiser()
 
 
 class HoldingsPercentageError(Exception):
