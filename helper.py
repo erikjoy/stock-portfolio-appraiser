@@ -16,8 +16,6 @@ class ProcessConfig:
                     cash_equivalents_percentage += percentage
                 else:
                     holdings[symbol] = percentage
-        if abs(total_percentage - 100) > 0.000001:
-            raise HoldingsPercentageError('The percentages of the holdings don\'t sum up to 100')
         return (holdings, cash_equivalents_percentage)
 
     @staticmethod
@@ -43,7 +41,3 @@ class ProcessConfig:
     def process_path(config_file_path):
         config = load(open(config_file_path, 'r'))
         return ProcessConfig.process(config)
-
-
-class HoldingsPercentageError(Exception):
-    '''Raise when the percentages of the holdings don't sum up to 100'''
