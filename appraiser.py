@@ -24,9 +24,9 @@ class PortfolioAppraiser:
         total_holdings_value += self.cash_equivalents_percentage * self.cash_equivalents_growth
         return total_holdings_value - 100
 
-    def _assist_calculate(self, stock_closing_data, symbol):
-        closing_price_yesterday = float(stock_closing_data[0])
-        closing_price_today = float(stock_closing_data[1])
+    def _assist_calculate(self, data, symbol):
+        closing_price_yesterday = float(data[0])
+        closing_price_today = float(data[2]) if (len(data) == 3 and data[1] != data[1]) else float(data[1])
         holding_percentage = self.holdings[symbol]
         current_holding_value = closing_price_today / closing_price_yesterday * holding_percentage
         return current_holding_value
