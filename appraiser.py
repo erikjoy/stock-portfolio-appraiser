@@ -3,13 +3,13 @@ import yfinance
 
 class PortfolioAppraiser:
     def __init__(self,
-                 holdings,
-                 cash_equivalents_percentage,
-                 cash_equivalents_growth):
+                 holdings: dict,
+                 cash_equivalents_percentage: float,
+                 cash_equivalents_change: float):
         PortfolioAppraiser._validate_percentages(holdings, cash_equivalents_percentage)
         self.holdings = holdings
         self.cash_equivalents_percentage = cash_equivalents_percentage
-        self.cash_equivalents_growth = cash_equivalents_growth
+        self.cash_equivalents_change = cash_equivalents_change
 
     def calculate(self):
         holdings_data = yfinance.download(' '.join(tuple(self.holdings)), group_by='ticker', period='2d')
@@ -21,7 +21,7 @@ class PortfolioAppraiser:
             for symbol in self.holdings:
                 stock_closing_data = holdings_data[symbol]['Close']
                 total_holdings_value += self._assist_calculate(stock_closing_data, symbol)
-        total_holdings_value += self.cash_equivalents_percentage * self.cash_equivalents_growth
+        total_holdings_value += self.cash_equivalents_percentage * self.cash_equivalents_change
         return total_holdings_value - 100
 
     def _assist_calculate(self, data, symbol):
@@ -34,8 +34,7 @@ class PortfolioAppraiser:
     @staticmethod
     def _validate_percentages(holdings, cash_equivalents_percentage):
         total_percentage = 0
-        for symbol in holdings:
-            percentage = holdings[symbol]
+        for percentage in holdings.values():
             total_percentage += percentage
         total_percentage += cash_equivalents_percentage
         if abs(total_percentage - 100) > 0.000001:
@@ -43,11 +42,11 @@ class PortfolioAppraiser:
 
 class FundAppraiser(PortfolioAppraiser):
     def __init__(self, 
-                 holdings,
-                 cash_equivalents_percentage,
-                 cash_equivalents_growth,
-                 fund_symbol):
-        super().__init__(holdings, cash_equivalents_percentage, cash_equivalents_growth)
+                 holdings: dict,
+                 cash_equivalents_percentage: float,
+                 cash_equivalents_change: float,
+                 fund_symbol: str):
+        super().__init__(holdings, cash_equivalents_percentage, cash_equivalents_change)
         self.fund_symbol = fund_symbol
 
     def calculate(self):

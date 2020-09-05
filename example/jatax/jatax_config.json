@@ -1,7 +1,0 @@
-{
-    "holdings_file_path": "example/jatax/jatax_holdings.txt",
-    "is_fund": true,
-    "fund_symbol": "JATAX",
-    "cash_equivalents_name": "CASHEQUIV",
-    "cash_equivalents_growth": 1.0
-}
