@@ -1,9 +1,10 @@
 import yfinance
+from typing import Tuple, Dict
 
 
 class PortfolioAppraiser:
     def __init__(self,
-                 holdings: dict,
+                 holdings: Dict[str, float],
                  cash_equivalents_percentage: float,
                  cash_equivalents_change: float):
         PortfolioAppraiser._validate_percentages(holdings, cash_equivalents_percentage)
@@ -11,7 +12,7 @@ class PortfolioAppraiser:
         self.cash_equivalents_percentage = cash_equivalents_percentage
         self.cash_equivalents_change = cash_equivalents_change
 
-    def calculate(self):
+    def calculate(self) -> float:
         holdings_data = yfinance.download(' '.join(tuple(self.holdings)), group_by='ticker', period='2d')
         if len(holdings_data.columns) / 6 == 1:
             symbol = tuple(self.holdings)[0]
@@ -42,14 +43,14 @@ class PortfolioAppraiser:
 
 class FundAppraiser(PortfolioAppraiser):
     def __init__(self, 
-                 holdings: dict,
+                 holdings: Dict[str, float],
                  cash_equivalents_percentage: float,
                  cash_equivalents_change: float,
                  fund_symbol: str):
         super().__init__(holdings, cash_equivalents_percentage, cash_equivalents_change)
         self.fund_symbol = fund_symbol
 
-    def calculate(self):
+    def calculate(self) -> Tuple[float, float]:
         percentage_change = super().calculate()
         fund_data = yfinance.Ticker(self.fund_symbol)
         closing_price_data = fund_data.history(period='2d')['Close']
